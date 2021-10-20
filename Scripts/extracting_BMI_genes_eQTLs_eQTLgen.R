@@ -27,7 +27,7 @@ sig_cis_eQTLs_filename <- gzfile('2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortI
 sig_cis_eQTLs <- read.table(sig_cis_eQTLs_filename,header=T)
 
 
-all_sig_eQTLs <- cbind(sig_cis_eQTLs, sig_trans_eQTLs)
+all_sig_eQTLs <- rbind(sig_cis_eQTLs, sig_trans_eQTLs)
 
 
 load("BMI_gene_list.rdata")
