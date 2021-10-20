@@ -206,5 +206,5 @@ max_abs_Z_experiment_expression <- lapply(1:length(datalist), func2)
 max_abs_Z_experiment_expression <- ldply(max_abs_Z_experiment_expression, data.table)
 
 
-save(max_abs_Z_experiment_expression, file="max_abs_Z_experiment_expression.rdata")
+save(max_abs_Z_experiment_expression, file="BMI_max_abs_Z_experiment_expression.rdata")
 
