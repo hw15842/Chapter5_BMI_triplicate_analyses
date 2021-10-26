@@ -132,6 +132,7 @@ func1 <- function(gene){
                         mean = mean(x$Z_score_adjusted),
                         Q3 = quantile(x$Z_score_adjusted, 0.75),
                         max = max(x$Z_score_adjusted)
+                        )
 
 
 
