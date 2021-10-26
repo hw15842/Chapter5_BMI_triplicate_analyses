@@ -101,7 +101,7 @@ sort_entrez <- uniq_entrez[order(as.numeric(uniq_entrez$index)),]
 
 ## load in BMI genes - this data set created in extract_expression_pairs_eQTLgen.R
 
-load("BMI_genes.rdata")
+load(paste0(data_location,"BMI_genes.rdata"))
 
 # Now we want to extract all the genes from L1000 that have an influence on 
 
@@ -135,7 +135,7 @@ all_gene_1s_for_BMI_genes <- lapply(gene_list, func1)
 all_gene_1s_for_BMI_genes <- bind_rows(all_gene_1s_for_BMI_genes)
 
 
-save(all_gene_1s_for_BMI_genes, file="all_gene_1s_for_BMI_genes.rdata")
+save(all_gene_1s_for_BMI_genes, file=paste0(data_location,"all_gene_1s_for_BMI_genes.rdata"))
 
 
 
