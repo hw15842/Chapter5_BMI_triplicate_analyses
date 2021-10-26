@@ -99,112 +99,45 @@ uniq_entrez <- merge_entrez[!duplicated(merge_entrez$entrez_id),]
 sort_entrez <- uniq_entrez[order(as.numeric(uniq_entrez$index)),]
 
 
-## load in the expression pairs - this data set created in extract_expression_pairs_eQTLgen.R
+## load in BMI genes - this data set created in extract_expression_pairs_eQTLgen.R
 
-load("BMI_gene_epxression_pairs.rdata")
+load("BMI_genes.rdata")
 
+# Now we want to extract all the genes from L1000 that have an influence on 
 
-# keep the proteins in collumn 1 (this is all of them as did the reverse of the pairs as well) that are in d2 dataset in the perturbations internal name column - d2 has been subset for the purturbations Tom wanted
-BMI_gene_expression_pairs_l1000 <- subset(BMI_gene_epxression_pairs, Var1 %in% d2$pert_iname) 
-# from prot_pairs_l1000, keep just the proteins in column 2 that match the entrez dataset hgnc symbol - still all proteins as did the reverse
-BMI_gene_expression_pairs_l1000 <- subset(BMI_gene_expression_pairs_l1000, Var2 %in% sort_entrez$hgnc_symbol)  
+# first remove the genes that are not in sort_entrez
 
-
-# so prot_pairs_l1000 are the protein pairs that have a hgnc symbol in the d2 dataset and the entrez dataset
- 
-
-datalist=list()
-# pull out Z scores
-for (i in 1:nrow(BMI_gene_expression_pairs_l1000)) {
-  cols <- which(d2$pert_iname==as.character(BMI_gene_expression_pairs_l1000[i,1])) # this is the row of the matrix and the first protein
-  row <-which(sort_entrez$hgnc_symbol==as.character(BMI_gene_expression_pairs_l1000[i,2])) # this is the column of the matrix and the second protein
-  indices <- cbind(row,cols)
-  #   if (nrow(d2[cols,])==1) {
-  #     paste(prot_pairs_l1000[i,],d2[cols,],ds@mat[indices])  
-  #   } else {
-  datalist[[i]] <- cbind(BMI_gene_expression_pairs_l1000[i,],d2[cols,][,1],ds@mat[indices])  # cbind the row of prot_pairs_l1000, the sig_id and the corresponding z score of the col and row of the matrix
-}
-BMI_gene_expression_pairs_l1000_results = do.call(rbind, datalist)
+BMI_genes <- subset(BMI_genes, BMI_genes$Var1 %in% sort_entrez$hgnc_symbol)
 
 
-colnames <- c("prot_1", "prot_2", "sig_info","Z") 
-datalist <- lapply(datalist, setNames, colnames)
+func1 <- function(gene){
 
-colnames(BMI_gene_expression_pairs_l1000_results) <- c("gene_1", "gene_2", "sig_info","Z")
+	row <-which(sort_entrez$hgnc_symbol==as.character(paste0(gene))) # this is extracting the second protein from the matrix
+	print(row)
+	x <- ds@mat[row,]
+	x <- stack(x)
+	print(head(x))
+	x_split_ID <- data.frame(do.call('rbind', strsplit(as.character(x$ind), ':', fixed=TRUE )))
+	print(head(x_split_ID))
+	x_split_ID2 <- data.frame(do.call('rbind', strsplit(as.character(x_split_ID$X2), '-', fixed=TRUE )))
+	print(head(x_split_ID2))
+	x$gene1 <- x_split_ID2$X1
+	print(head(x))
+	x$gene2 <- paste0(gene)
+	print(head(x))
+	return(x)
 
-save(datalist, file="BMI_gene_expression_pairs_l1000_list_of_dataframes.rdata")
-
-save(BMI_gene_expression_pairs_l1000_results, file="BMI_gene_expression_pairs_l1000_results.rdata")
-
-# datalist gives us a list of dataframes - one dataframe for each cpg snp pair - 3,390 dataframes
-# prot_pairs_l1000_results gives us dataframe of all snp-cpg pairs and their associated sig_id and the z-score for that sig_id
-# sig_id = (A CMap unique identification number assigned to each signature generated from L1000 data)
-
-
-# Z-score   For a data point, the number of standard deviations that point is above or below the population mean is called its Z-score. 
-# In the L1000 data processing pipeline, we compute a robust z-score for each gene in each sample. 
-# The reference population used to compute the median and MAD is the expression of the given gene in every other well on the plate. 
-# These z-score values correspond to level 4 data
-
-
-
-### startby taking an average of all the different perturbations for each protein pair
-
-ave_zscore_func <- function(gene_expression_pairs_dataset){
-
-	df <- datalist[[gene_expression_pairs_dataset]]
-	z_ave <- mean(df$Z)
-	df <- df[1, 1:3]
-	df <- as.data.frame(cbind(df, z_ave))
-	names(df) <- c("expression_1", "expression_2", "sig_info", "Z_ave")
-	return(df)
 }
 
-BMI_gene_expression_pairs_l1000_ave_zscores <- lapply(1:length(datalist), ave_zscore_func)
+gene_list <- BMI_genes$Var1
 
-############################################################################################################################
-## Script stopped running here as forgot to load plyr library
-## see:
-## split_df_expression_pairs_and_extra_analyses.R 
-## script for how i use the dplyr functions to split the full dataframe back up 
-## then run the ave func and splitting by experiment type etc 
-############################################################################################################################
-
-BMI_gene_expression_pairs_l1000_ave_zscores <- ldply(BMI_gene_expression_pairs_l1000_ave_zscores, data.table)
-
-save(BMI_gene_expression_pairs_l1000_ave_zscores, file="BMI_gene_expression_pairs_l1000_ave_zscores.rdata")
-
-##### 
+all_gene_1s_for_BMI_genes <- lapply(gene_list, func1)
+all_gene_1s_for_BMI_genes <- bind_rows(all_gene_1s_for_BMI_genes)
 
 
-### Also get the experiment type data for the max Z score 
-
-
-func1 <- function(dataframe){
-
-  df <- datalist[[dataframe]]
-  split_df <- data.frame(do.call('rbind', strsplit(as.character(df$sig_info), ':', fixed=TRUE )))
-  df$experiment_name <- split_df$X1
-  return(df)
-}
-
-datalist <- lapply(1:length(datalist), func1)
+save(all_gene_1s_for_BMI_genes, file="all_gene_1s_for_BMI_genes.rdata")
 
 
 
-## for each prot pair (each dataframe) which experiment has the largest absolute Z score 
 
-func2 <- function(dataframe){
-
-  df <- datalist[[dataframe]]
-  largest_abs_Z_row <- df[which.max(abs(df$Z)),]
-  largest_abs_Z_row$num_experiments <- nrow(df)
-  return(largest_abs_Z_row)
-}
-
-max_abs_Z_experiment_expression <- lapply(1:length(datalist), func2)
-max_abs_Z_experiment_expression <- ldply(max_abs_Z_experiment_expression, data.table)
-
-
-save(max_abs_Z_experiment_expression, file="BMI_max_abs_Z_experiment_expression.rdata")
 
