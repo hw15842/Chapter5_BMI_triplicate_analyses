@@ -113,19 +113,32 @@ BMI_genes <- subset(BMI_genes, BMI_genes$Var1 %in% sort_entrez$hgnc_symbol)
 func1 <- function(gene){
 
 	row <-which(sort_entrez$hgnc_symbol==as.character(paste0(gene))) # this is extracting the second protein from the matrix
-	print(row)
 	x <- ds@mat[row,]
 	x <- stack(x)
-	print(head(x))
 	x_split_ID <- data.frame(do.call('rbind', strsplit(as.character(x$ind), ':', fixed=TRUE )))
-	print(head(x_split_ID))
 	x_split_ID2 <- data.frame(do.call('rbind', strsplit(as.character(x_split_ID$X2), '-', fixed=TRUE )))
-	print(head(x_split_ID2))
 	x$gene1 <- x_split_ID2$X1
-	print(head(x))
 	x$gene2 <- paste0(gene)
-	print(head(x))
-	return(x)
+
+
+  	x$Z_score_adjusted <- ifelse(grepl("CGS001",x$ind), (x$values * (-1)), x$values)
+  
+  	x_new <- data.frame(	gene_1 = x[1,3], 
+                        gene_2 = x[1,4], 
+                        num_tests = nrow(x), 
+                        min = min(x$Z_score_adjusted),
+                        Q1 = quantile(x$Z_score_adjusted, 0.25),
+                        median = median(x$Z_score_adjusted),
+                        mean = mean(x$Z_score_adjusted),
+                        Q3 = quantile(x$Z_score_adjusted, 0.75),
+                        max = max(x$Z_score_adjusted)
+
+
+
+
+
+
+	return(x_new)
 
 }
 
