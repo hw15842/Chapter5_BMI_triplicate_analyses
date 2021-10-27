@@ -120,26 +120,34 @@ func1 <- function(gene){
 	x$gene1 <- x_split_ID2$X1
 	x$gene2 <- paste0(gene)
 
+	x_dfs <- x %>% group_by(gene1, gene2)
+	x_dfs <- group_split(x_dfs)
 
-  	x$Z_score_adjusted <- ifelse(grepl("CGS001",x$ind), (x$values * (-1)), x$values)
+
+	split_by_gene_pair_func <- function(dataframe){
+
+		df <- x_dfs[[dataframe]]
+		df$Z_score_adjusted <- ifelse(grepl("CGS001",df$ind), (df$values * (-1)), df$values)
   
-  	x_new <- data.frame(	gene_1 = x[1,3], 
-                        gene_2 = x[1,4], 
-                        num_tests = nrow(x), 
-                        min = min(x$Z_score_adjusted),
-                        Q1 = quantile(x$Z_score_adjusted, 0.25),
-                        median = median(x$Z_score_adjusted),
-                        mean = mean(x$Z_score_adjusted),
-                        Q3 = quantile(x$Z_score_adjusted, 0.75),
-                        max = max(x$Z_score_adjusted)
+  		df_new <- data.frame(	gene_1 = df[1,3], 
+                        gene_2 = df[1,4], 
+                        num_tests = nrow(df), 
+                        min = min(df$Z_score_adjusted),
+                        Q1 = quantile(df$Z_score_adjusted, 0.25),
+                        median = median(df$Z_score_adjusted),
+                        mean = mean(df$Z_score_adjusted),
+                        Q3 = quantile(df$Z_score_adjusted, 0.75),
+                        max = max(df$Z_score_adjusted)
                         )
 
+  		return(df_new)
 
+	}
 
-
-
-
-	return(x_new)
+	y <- lapply(1:length(x_dfs), split_by_gene_pair_func)
+	y <- bind_rows(y)
+  	
+	return(y)
 
 }
 
