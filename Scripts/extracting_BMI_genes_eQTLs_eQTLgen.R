@@ -5,6 +5,11 @@
 ## module add languages/r/4.0.3 
 # has to be in R version 4
 
+
+### DO NOT USE THESE DATA AS EQTLS!!!!!
+### THEY HAVENT UNDERGONE QCING ETC
+### JUST USING THE ENSG ID IN THE TRIPLICATE R SCRIPT 
+
 args  <-  commandArgs(trailingOnly=TRUE)
 data_location <- toString(args[1])
 
@@ -36,3 +41,10 @@ BMI_gene_eQTLs <- subset(all_sig_eQTLs, all_sig_eQTLs$GeneSymbol %in% BMI_gene_l
 
 
 save(BMI_gene_eQTLs, file="BMI_gene_eQTLs.rdata")
+
+
+BMI_genes_ENSG_ID <- BMI_gene_eQTLs[,8:13]
+BMI_genes_ENSG_ID <- unique(BMI_genes_ENSG_ID)
+save(BMI_genes_ENSG_ID, file="BMI_genes_ENSG_ID.rdata")
+
+
