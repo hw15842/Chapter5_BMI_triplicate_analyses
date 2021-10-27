@@ -43,8 +43,9 @@ BMI_gene_eQTLs <- subset(all_sig_eQTLs, all_sig_eQTLs$GeneSymbol %in% BMI_gene_l
 save(BMI_gene_eQTLs, file="BMI_gene_eQTLs.rdata")
 
 
-BMI_genes_ENSG_ID <- BMI_gene_eQTLs[,8:13]
+BMI_genes_ENSG_ID <- BMI_gene_eQTLs[,8:11]
 BMI_genes_ENSG_ID <- unique(BMI_genes_ENSG_ID)
 save(BMI_genes_ENSG_ID, file="BMI_genes_ENSG_ID.rdata")
+
 
 
