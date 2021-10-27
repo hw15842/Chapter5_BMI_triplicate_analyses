@@ -159,6 +159,19 @@ all_gene_1s_for_BMI_genes <- bind_rows(all_gene_1s_for_BMI_genes)
 
 save(all_gene_1s_for_BMI_genes, file=paste0(data_location,"all_gene_1s_for_BMI_genes.rdata"))
 
+L1000_BMI_expression_pair_averages <- all_gene_1s_for_BMI_genes
+
+L1000_BMI_expression_pair_averages$largest <- ifelse(abs(L1000_BMI_expression_pair_averages$min) > abs(L1000_BMI_expression_pair_averages$max), L1000_BMI_expression_pair_averages$min, L1000_BMI_expression_pair_averages$max)
+L1000_BMI_expression_pair_averages$pval_max_z <- (pnorm(abs(L1000_BMI_expression_pair_averages$largest), lower.tail=F))*2
+L1000_BMI_expression_pair_averages$fdr <- p.adjust(L1000_BMI_expression_pair_averages$pval_max_z, "fdr")
+
+
+
+table(L1000_BMI_expression_pair_averages$fdr < 0.05) 
+
+sig_l1000_BMI_gene_pairs <- subset(L1000_BMI_expression_pair_averages, L1000_BMI_expression_pair_averages$fdr < 0.05)
+
+save(sig_l1000_BMI_gene_pairs, file=paste0(data_location, "sig_l1000_BMI_gene_pairs.rdata"))
 
 
 
