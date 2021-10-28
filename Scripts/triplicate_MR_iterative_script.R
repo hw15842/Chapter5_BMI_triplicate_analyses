@@ -22,6 +22,7 @@ library(plyr)
 library(data.table)
 
 load(paste0(data_location,"sig_l1000_BMI_gene_pairs_to_use.rdata"))
+load(paste0(data_location, "BMI_genes_ENSG_ID.rdata"))
 
 row <- unlist(regmatches(row_num, gregexpr('\\(?[0-9,.]+', network_num))) ### This stops it pasting the full "--section_of_subset=1" and just keeps the "1" 
 
