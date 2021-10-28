@@ -34,7 +34,7 @@ row
 
 MR_func <- function(gene_pair_line){
   
-  df <- sig_l1000_BMI_gene_pairs[gene_pair_line,]
+  df <- sig_l1000_BMI_gene_pairs_to_use[gene_pair_line,]
   print(df)
   gene1_ENSG_ID <- subset(BMI_genes_ENSG_ID, BMI_genes_ENSG_ID$GeneSymbol == df$gene1)[1,]
   print(gene1_ENSG_ID)
