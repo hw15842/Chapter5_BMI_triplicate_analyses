@@ -10,4 +10,4 @@
 
 echo "Running on ${HOSTNAME}"
 module add languages/r/3.6.2
-Rscript all_network_PheWAS_analysis_iterative_GO.R /mnt/storage/scratch/hw15842/repo/Chapter5_BMI_triplicate_analyses/Data/ /mnt/storage/scratch/hw15842/repo/Chapter5_BMI_triplicate_analyses/Data/triplicate_iterative_results/ --row_num=${SLURM_ARRAY_TASK_ID} 4000
+Rscript triplicate_MR_iterative_script.R /mnt/storage/scratch/hw15842/repo/Chapter5_BMI_triplicate_analyses/Data/ /mnt/storage/scratch/hw15842/repo/Chapter5_BMI_triplicate_analyses/Data/triplicate_iterative_results/ --row_num=${SLURM_ARRAY_TASK_ID} 4000
