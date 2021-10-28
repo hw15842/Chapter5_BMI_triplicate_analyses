@@ -3,7 +3,7 @@
 #SBATCH --job-name=go_1
 #SBATCH --nodes=1
 #SBATCH --time=12:00:00
-#SBATCH --array=1-916%10
+#SBATCH --array=1-916%1
 #SBATCH --mem=10000M
 #SBATCH --output=slurm-%A_%a.out
 #SBATCH --partition=serial
